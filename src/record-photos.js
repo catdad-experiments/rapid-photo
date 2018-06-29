@@ -3,8 +3,6 @@
 
 (function (register) {
   var NAME = 'record-photos';
-  var PHOTO_COUNT = 10;
-  var INTERVAL = 1000;
   var capturing = false;
 
   var canvas = document.createElement('canvas');
@@ -19,7 +17,7 @@
     });
   }
 
-  function start(video, context) {
+  function start(video, opts, context) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
 
@@ -28,7 +26,8 @@
 
     capturing = true;
 
-    var count = PHOTO_COUNT;
+    var count = opts.count || 1;
+    var interval = (opts.interval || 1) * 1000;
 
     function onDone() {
       context.events.emit('stop-video');
@@ -41,29 +40,37 @@
         capture(video, context);
 
         if (count) {
-          return setTimeout(frame, INTERVAL);
+          return setTimeout(frame, interval);
         }
       }
 
       return onDone();
-    }, INTERVAL);
+    }, interval);
 
     context.events.emit('capture-start');
   }
 
   register(NAME, function () {
     var context = this;
-    var sourceMedia;
+    var options;
 
     function onVideo(video) {
-      start(video, context);
+      start(video, options, context);
+      options = null;
     }
 
-    context.events.on('video-playing', onVideo);
+    function onCapture(opts) {
+      options = opts;
+      context.events.once('video-playing', onVideo);
+      context.events.emit('start-video');
+    }
+
+    context.events.on('capture', onCapture);
 
     return function destroy() {
       capturing = false;
 
+      context.events.off('capture', onCapture);
       context.events.off('video-playing', onVideo);
     };
   });

@@ -45,8 +45,17 @@ footer span {
   vertical-align: middle;
 }
 
-.sprite {
-  display: none;
+.material-icons.material-inline {
+  font-size: 1.1rem;
+  line-height: 1;
+  vertical-align: bottom;
+}
+
+/* turn off number innput arrows */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .container {
@@ -58,6 +67,11 @@ footer span {
 
   display: flex;
   flex-direction: column;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .container:after {
@@ -103,64 +117,88 @@ video {
   width: 100%;
 }
 
-.canvas-container {
-  position: relative;
-
-  width: 400px;
-  height: 400px;
-  margin: auto;
+img {
+  display: block;
+  max-width: 100%;
+  margin: 6px auto 0px;
 }
 
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
+.controls {
+  margin: 20px auto;
+}
+.control {
+  display: block;
+  margin: 10px auto;
+}
+
+.controls label {
+  display: block;
   width: 100%;
-  height: 100%;
-
-  will-change: transform;
+  text-align: center;
+  padding: 0 0 4px 0;
 }
 
-canvas.video, .hero-color {
-  border-radius: 2px 2px 2px 2px;
+.controls i {
+  vertical-align: bottom;
 }
 
-.hero-color {
-  position: relative;
-
-  width: 400px;
-  min-height: 200px;
-
-  margin: 20px auto 0;
-  box-shadow: inset 0 0 0 6px #e5e5e5;
-
-  will-change: background-color;
+.capture {
+  outline: none;
+  border: none;
+  background: #abd64d;
+  width: 200px;
+  height: 200px;
+  border-radius: 200px;
+}
+.compact .capture {
+  width: 200px;
+  height: auto;
+  border-radius: 1rem;
 }
 
-.hero-meta {
-  position: absolute;
-  box-sizing: border-box;
-  top: 0;
-  width: 100%;
-  padding: 10px;
-
+.capture i {
+  font-size: 5rem;
   color: #24292e;
-  background: #e5e5e5;
-
-  border-radius: 20px 20px 0 0;
+}
+.capture.active i {
+  color: #d64c4f;
 }
 
-span.icon {
-  position: relative;
+.input {
+  margin-top: 20px;
+  width: 200px;
+}
+
+.input input, .input i {
+  font-size: 1.6rem;
+}
+
+.input input, .input button {
   display: inline-block;
-  height: 1.1rem;
-  width: 1.1rem;
+  height: 3rem;
+  outline: none;
+  border-radius: 3px;
+  vertical-align: bottom;
+  padding: 0;
+  margin: 0;
+  background: #3d4045;
+  border: 1px solid #24292e;
+  color: #e5e5e5;
+  box-sizing: border-box;
 }
-svg.icon {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 100%;
 
-  fill: #e5e5e5;
+.input input:focus, .input input:active,
+.input button:focus, .input input:active {
+  border: 1px solid #abd64d;
+}
+
+.input input {
+  width: 110px;
+  padding: 0 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.input button {
+  width: 40px;
 }

@@ -102,6 +102,7 @@ window.addEventListener('load', function () {
   // load all the modules from the server directly
   Promise.all([
     loadScript('src/event-emitter.js'),
+    loadScript('src/controls.js'),
     loadScript('src/get-video.js'),
     loadScript('src/record-photos.js'),
     loadScript('src/display-photos.js'),
@@ -109,6 +110,7 @@ window.addEventListener('load', function () {
     // set up a global event emitter
     context.events = modules['event-emitter']();
 
+    var controlsDestroy = modules['controls']();
     var getVideoDestroy = modules['get-video']();
     var recordPhotosDestroy = modules['record-photos']();
     var displayPhotosDestroy = modules['display-photos']();
@@ -116,15 +118,22 @@ window.addEventListener('load', function () {
     context.events.on('error', function (err) {
       onError(err);
 
+      controlsDestroy();
       getVideoDestroy();
       recordPhotosDestroy();
       displayPhotosDestroy();
     });
+  }).catch(function catchErr(err) {
+    if (context.events) {
+      context.events.emit('error', err);
+      return onError(err);
+    }
 
-    // start the app
-    context.events.emit('start-video');
-  }).catch(function (err) {
-    context.events.emit('error', err);
+    if (modules['event-emitter']) {
+      context.events = modules['event-emitter']();
+      return catchErr(err);
+    }
+
     onError(err);
   });
 });
