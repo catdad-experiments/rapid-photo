@@ -6,7 +6,7 @@
   var controlsElem = document.querySelector('#controls');
   var captureBtn = document.querySelector('#capture');
 
-  function createInput(id, defaultVal) {
+  function createInput(id, increment) {
     var elem = document.querySelector('#' + id);
     var fieldElem = elem.querySelector('.field');
     var lessElem = elem.querySelector('.less');
@@ -15,12 +15,12 @@
     var value = Number(fieldElem.value);
 
     function onMore() {
-      value += 1;
+      value = increment(value, 1);
       fieldElem.value = value;
     }
 
     function onLess() {
-      value -= 1;
+      value = increment(value, -1);
       fieldElem.value = value;
     }
 
@@ -45,14 +45,24 @@
     });
   }
 
+  function incrementCount(value, mod) {
+    if (value === 1 && mod < 0) {
+      return value;
+    }
+
+    return value + mod;
+  }
+
   register(NAME, function () {
     var context = this;
 
-    var countControl = createInput('count');
+    var countControl = createInput('count', incrementCount);
+    var intervalControl = createInput('interval', incrementCount);
 
     function onCaptureBtn() {
       context.events.emit('capture', {
-        count: countControl.value
+        count: countControl.value,
+        interval: intervalControl.value
       });
     }
 
@@ -75,6 +85,7 @@
       context.events.off('capture-end', onCaptureEnd);
 
       countControl.destroy();
+      intervalControl.destroy();
     };
   });
 }(window.registerModule));
