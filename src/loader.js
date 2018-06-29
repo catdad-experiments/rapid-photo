@@ -103,16 +103,19 @@ window.addEventListener('load', function () {
   Promise.all([
     loadScript('src/event-emitter.js'),
     loadScript('src/get-video.js'),
+    loadScript('src/record-photos.js'),
   ]).then(function () {
     // set up a global event emitter
     context.events = modules['event-emitter']();
 
     var getVideoDestroy = modules['get-video']();
+    var recordPhotosDestroy = modules['record-photos']();
 
     context.events.on('error', function (err) {
       onError(err);
 
       getVideoDestroy();
+      recordPhotosDestroy();
     });
 
     // start the app
