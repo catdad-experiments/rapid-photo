@@ -10,14 +10,16 @@
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
 
-  function capture(video) {
+  function capture(video, context) {
     context.drawImage(video, 0, 0);
     var data = canvas.toDataURL();
 
-    console.log('captured photo of %s length', data.length);
+    context.events.emit('capture-photo', {
+      dataUrl: data
+    });
   }
 
-  function onVideo(video) {
+  function start(video, context) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
 
@@ -28,23 +30,34 @@
 
     var count = PHOTO_COUNT;
 
+    function onDone() {
+      context.events.emit('stop-video');
+      context.events.emit('capture-ended');
+    }
+
     setTimeout(function frame() {
-      if (!capturing) {
-        return;
+      if (capturing) {
+        count -= 1;
+        capture(video);
+
+        if (count) {
+          return setTimeout(frame, INTERVAL);
+        }
       }
 
-      count -= 1;
-      capture(video);
-
-      if (count) {
-        setTimeout(frame, INTERVAL);
-      }
+      return onDone();
     }, INTERVAL);
+
+    context.events.emit('capture-started');
   }
 
   register(NAME, function () {
     var context = this;
     var sourceMedia;
+
+    function onVideo(video) {
+      start(video, context);
+    }
 
     context.events.on('video-playing', onVideo);
 
