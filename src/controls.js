@@ -53,11 +53,26 @@
     return value + mod;
   }
 
+  function incrementInterval(value, mod) {
+    var increments = [0.03, 0.1, 0.5, 1, 1.5, 2];
+    var idx = increments.indexOf(value);
+
+    if (idx === -1 || idx === (increments.length - 1)) {
+      return value + mod;
+    }
+
+    if (idx === 0 && mod === -1) {
+      return value;
+    }
+
+    return increments[idx + mod];
+  }
+
   register(NAME, function () {
     var context = this;
 
     var countControl = createInput('count', incrementCount);
-    var intervalControl = createInput('interval', incrementCount);
+    var intervalControl = createInput('interval', incrementInterval);
 
     function onCaptureBtn() {
       context.events.emit('capture', {
