@@ -3,8 +3,6 @@
 
 (function (register) {
   var NAME = 'record-photos';
-  var PHOTO_COUNT = 10;
-  var INTERVAL = 1000;
   var capturing = false;
 
   var canvas = document.createElement('canvas');
@@ -28,7 +26,8 @@
 
     capturing = true;
 
-    var count = opts.count || PHOTO_COUNT;
+    var count = opts.count || 1;
+    var interval = (opts.interval || 1) * 1000;
 
     function onDone() {
       context.events.emit('stop-video');
@@ -41,12 +40,12 @@
         capture(video, context);
 
         if (count) {
-          return setTimeout(frame, INTERVAL);
+          return setTimeout(frame, interval);
         }
       }
 
       return onDone();
-    }, INTERVAL);
+    }, interval);
 
     context.events.emit('capture-start');
   }
