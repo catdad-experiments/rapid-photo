@@ -110,20 +110,30 @@ video {
   width: 100%;
 }
 
-.capture {
+.controls {
+  margin: 20px auto;
+}
+.control {
   display: block;
+  margin: 10px auto;
+}
+
+.controls label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0 0 4px 0;
+}
+
+.capture {
   outline: none;
   border: none;
   background: #abd64d;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-.capture.hero {
   width: 200px;
   height: 200px;
   border-radius: 200px;
 }
-.capture.compact {
+.compact .capture {
   width: 200px;
   height: auto;
   border-radius: 1rem;
@@ -135,4 +145,31 @@ video {
 }
 .capture.active i {
   color: #d64c4f;
+}
+
+.input {
+  width: 200px;
+}
+
+.input input, .input button {
+  display: inline-block;
+  height: 2rem;
+  outline: none;
+  border-radius: 3px;
+  vertical-align: bottom;
+  padding: 0;
+  margin: 0;
+  background: #3d4045;
+  border: 1px solid #24292e;
+  color: #e5e5e5;
+  box-sizing: border-box;
+}
+
+.input input {
+  width: 130px;
+  padding: 0 10px;
+}
+
+.input button {
+  width: 30px;
 }

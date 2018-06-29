@@ -3,6 +3,7 @@
 
 (function (register) {
   var NAME = 'controls';
+  var controlsElem = document.querySelector('#controls');
   var captureBtn = document.querySelector('#capture');
 
   register(NAME, function () {
@@ -18,8 +19,8 @@
     }
 
     function onCaptureEnd() {
+      controlsElem.classList.add('compact');
       captureBtn.classList.remove('active');
-      captureBtn.classList.add('compact');
     }
 
     captureBtn.addEventListener('click', onCaptureBtn);
