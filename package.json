@@ -1,0 +1,23 @@
+{
+  "name": "rapid-photo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server . --ssl --key certs/localhost.key --cert certs/localhost.crt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/catdad-experiments/rapid-photo.git"
+  },
+  "author": "Kiril Vatev <vatev.1@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/catdad-experiments/rapid-photo/issues"
+  },
+  "homepage": "https://github.com/catdad-experiments/rapid-photo#readme",
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}
