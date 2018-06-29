@@ -8,10 +8,10 @@
   var capturing = false;
 
   var canvas = document.createElement('canvas');
-  var context = canvas.getContext('2d');
+  var canvasCtx = canvas.getContext('2d');
 
   function capture(video, context) {
-    context.drawImage(video, 0, 0);
+    canvasCtx.drawImage(video, 0, 0);
     var data = canvas.toDataURL();
 
     context.events.emit('capture-photo', {
@@ -32,13 +32,13 @@
 
     function onDone() {
       context.events.emit('stop-video');
-      context.events.emit('capture-ended');
+      context.events.emit('capture-end');
     }
 
     setTimeout(function frame() {
       if (capturing) {
         count -= 1;
-        capture(video);
+        capture(video, context);
 
         if (count) {
           return setTimeout(frame, INTERVAL);
@@ -48,7 +48,7 @@
       return onDone();
     }, INTERVAL);
 
-    context.events.emit('capture-started');
+    context.events.emit('capture-start');
   }
 
   register(NAME, function () {
