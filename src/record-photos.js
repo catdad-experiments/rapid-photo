@@ -19,7 +19,7 @@
     });
   }
 
-  function start(video, context) {
+  function start(video, opts, context) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
 
@@ -28,7 +28,7 @@
 
     capturing = true;
 
-    var count = PHOTO_COUNT;
+    var count = opts.count || PHOTO_COUNT;
 
     function onDone() {
       context.events.emit('stop-video');
@@ -53,17 +53,25 @@
 
   register(NAME, function () {
     var context = this;
-    var sourceMedia;
+    var options;
 
     function onVideo(video) {
-      start(video, context);
+      start(video, options, context);
+      options = null;
     }
 
-    context.events.on('video-playing', onVideo);
+    function onCapture(opts) {
+      options = opts;
+      context.events.once('video-playing', onVideo);
+      context.events.emit('start-video');
+    }
+
+    context.events.on('capture', onCapture);
 
     return function destroy() {
       capturing = false;
 
+      context.events.off('capture', onCapture);
       context.events.off('video-playing', onVideo);
     };
   });

@@ -51,8 +51,9 @@
     var countControl = createInput('count');
 
     function onCaptureBtn() {
-      // starting a new video will begin a capture
-      context.events.emit('start-video');
+      context.events.emit('capture', {
+        count: countControl.value
+      });
     }
 
     function onCaptureStart() {
