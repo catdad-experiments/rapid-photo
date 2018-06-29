@@ -28,9 +28,18 @@
     <video id="video" class="center" autoplay></video>
 
     <div class="contents">
-      <button id="capture" class="capture center hero">
-        <i class="material-icons main">videocam</i>
-      </button>
+      <div id="controls" class="controls center">
+        <button id="capture" class="capture control">
+          <i class="material-icons main">videocam</i>
+        </button>
+
+        <div id="count" class="input control">
+          <label for="count">Count:</label>
+          <button class="less"><i class="material-icons">arrow_left</i></button>
+          <input class="field" type="number" value="10">
+          <button class="more"><i class="material-icons">arrow_right</i></button>
+        </div>
+      </div>
 
       <div id="photos" class="center"></div>
     </div>
