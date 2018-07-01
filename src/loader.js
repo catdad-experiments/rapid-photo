@@ -102,6 +102,7 @@ window.addEventListener('load', function () {
   // load all the modules from the server directly
   Promise.all([
     loadScript('src/event-emitter.js'),
+    loadScript('src/storage.js'),
     loadScript('src/controls.js'),
     loadScript('src/get-video.js'),
     loadScript('src/record-photos.js'),
@@ -110,6 +111,7 @@ window.addEventListener('load', function () {
     // set up a global event emitter
     context.events = modules['event-emitter']();
 
+    var storageDestroy = modules['storage']();
     var controlsDestroy = modules['controls']();
     var getVideoDestroy = modules['get-video']();
     var recordPhotosDestroy = modules['record-photos']();
@@ -118,6 +120,7 @@ window.addEventListener('load', function () {
     context.events.on('error', function (err) {
       onError(err);
 
+      storageDestroy();
       controlsDestroy();
       getVideoDestroy();
       recordPhotosDestroy();
