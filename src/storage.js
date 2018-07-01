@@ -7,7 +7,7 @@
   var DB;
 
   var hasDb = (function () {
-    return false; // typeof indexedDB !== undefined;
+    return typeof indexedDB !== undefined;
   }());
 
   function enoent() {
