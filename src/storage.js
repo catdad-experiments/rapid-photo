@@ -11,6 +11,14 @@
     return err;
   }
 
+  // all keys in the query must match the key in
+  // the record of be *
+  function match(query, record) {
+    return Object.keys(query).reduce(function (memo, key) {
+      return memo || query[key] === '*' || query[key] === record[key];
+    }, false);
+  }
+
   register(NAME, function () {
     var context = this;
 
@@ -24,16 +32,6 @@
       });
     }
 
-    function remove(query) {
-      return new Promise(function (resolve, reject) {
-        STORAGE = STORAGE.filter(function (record) {
-          return record.dataUrl !== query.dataUrl;
-        });
-
-        resolve();
-      });
-    }
-
     function removeAll() {
       return new Promise(function (resolve, reject) {
         STORAGE = [];
@@ -42,11 +40,20 @@
       });
     }
 
+    function remove(query) {
+      return new Promise(function (resolve, reject) {
+        STORAGE = STORAGE.filter(function (record) {
+          return !match(query, record);
+        });
+
+        resolve();
+      });
+    }
+
     function getAll(query) {
       return new Promise(function (resolve, reject) {
         var found = STORAGE.filter(function (record) {
-          return query.dataUrl === '*' ||
-            query.dataUrl === record.dataUrl;
+          return match(query, record);
         });
 
         if (found.lenth === 0) {
@@ -57,7 +64,7 @@
       });
     }
 
-    function getFirst(query) {
+    function get(query) {
       return getAll(query).then(function (found) {
         return Promise.resolve(found[0]);
       });
@@ -66,8 +73,9 @@
     return {
       save: save,
       remove: remove,
-      getAll: getAll,
-      getFirst: getFirst
+      removeAll: removeAll,
+      get: get,
+      getAll: getAll
     };
   });
 }(window.registerModule));
