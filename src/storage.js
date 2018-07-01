@@ -63,13 +63,11 @@
       });
     }
 
-    context.storage = {
+    return {
       save: save,
       remove: remove,
       getAll: getAll,
       getFirst: getFirst
     };
-
-    return function destroy() {};
   });
 }(window.registerModule));

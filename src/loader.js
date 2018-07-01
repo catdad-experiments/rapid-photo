@@ -110,8 +110,9 @@ window.addEventListener('load', function () {
   ]).then(function () {
     // set up a global event emitter
     context.events = modules['event-emitter']();
+    // set up a global storage api
+    context.storage = modules['storage']();
 
-    var storageDestroy = modules['storage']();
     var controlsDestroy = modules['controls']();
     var getVideoDestroy = modules['get-video']();
     var recordPhotosDestroy = modules['record-photos']();
@@ -120,7 +121,6 @@ window.addEventListener('load', function () {
     context.events.on('error', function (err) {
       onError(err);
 
-      storageDestroy();
       controlsDestroy();
       getVideoDestroy();
       recordPhotosDestroy();
