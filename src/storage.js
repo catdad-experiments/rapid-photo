@@ -4,6 +4,11 @@
 (function (register) {
   var NAME = 'storage';
   var STORAGE = [];
+  var DB;
+
+  var hasDb = (function () {
+    return false; // typeof indexedDB !== undefined;
+  }());
 
   function enoent() {
     var err = new Error('enoent');
@@ -66,8 +71,29 @@
     });
   }
 
+  function initIndexedDb() {
+    var version = 1;
+
+    return new Promise(function (resolve, reject) {
+      if (!hasDb) {
+        return setTimeout(reject, 0, new Error(
+          'there is no storage, there may be limited functionality'
+        ));
+      }
+    });
+  }
+
+  function onDbAvailable() {}
+
   register(NAME, function () {
     var context = this;
+
+    initIndexedDb().then(function (db) {
+      DB = db;
+      onDbAvailable();
+    }).catch(function (err) {
+      context.events.emit('warn', err);
+    });
 
     return {
       save: save,
