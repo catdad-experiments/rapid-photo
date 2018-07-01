@@ -6,6 +6,11 @@ window.addEventListener('load', function () {
   var headerContainer = header.querySelector('.header-container');
   var prompt = document.querySelector('#prompt');
 
+  function clearPrompt() {
+    prompt.classList.add('hide');
+    headerContainer.classList.remove('error');
+  }
+
   function showPrompt(message, type) {
     if (typeof message === 'string') {
       message = [message];
@@ -122,6 +127,14 @@ window.addEventListener('load', function () {
       getVideoDestroy();
       recordPhotosDestroy();
       displayPhotosDestroy();
+    });
+
+    context.events.on('warn', function (err) {
+      onError(err);
+
+      setTimeout(function () {
+        clearPrompt();
+      }, 8 * 1000);
     });
   }).catch(function catchErr(err) {
     if (context.events) {
