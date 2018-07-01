@@ -7,43 +7,36 @@
 
   register(NAME, function () {
     var context = this;
-    var photos;
+    var group;
 
-    function onCaptureStart() {
-      photos = [];
+    function onCaptureStart(ev) {
+      group = ev.group;
       container.innerHTML = '';
     }
 
     function onCaptureEnd() {
       var fragment = document.createDocumentFragment();
 
-      photos.forEach(function (dataUrl) {
-        var img = document.createElement('img');
-        img.src = dataUrl;
+      context.storage.getAll({
+        group: group
+      }).then(function (photos) {
+        photos.forEach(function (record) {
+          var img = document.createElement('img');
+          img.src = record.dataUrl;
 
-        fragment.appendChild(img);
+          fragment.appendChild(img);
+        });
+
+        container.appendChild(fragment);
       });
-
-      container.appendChild(fragment);
-
-      // reset photos
-      photos = null;
-    }
-
-    function onCapturePhoto(ev) {
-      if (photos) {
-        photos.push(ev.dataUrl);
-      }
     }
 
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-end', onCaptureEnd);
-    context.events.on('capture-photo', onCapturePhoto);
 
     return function destroy() {
       context.events.off('capture-start', onCaptureStart);
       context.events.off('capture-end', onCaptureEnd);
-      context.events.off('capture-photo', onCapturePhoto);
     };
   });
 }(window.registerModule));
