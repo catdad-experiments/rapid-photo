@@ -35,10 +35,13 @@
     }
 
     return navigator.mediaDevices.getUserMedia({
+      audio: false,
       video: {
-        mandatory: {
-          sourceId: sourceId
-        }
+        // these options only work with adapter.js
+        // https://github.com/webrtc/adapter
+        deviceId: sourceId,
+        width: 10000,
+        height: 10000
       }
     });
   }
