@@ -43,7 +43,9 @@
 
   function removeAll() {
     if (DB) {
-      return DB.photos.where().delete().then(function () {
+      // Dexie always needs a query. Since 'group' will never equal *,
+      // that query will match all records
+      return DB.photos.where('group').notEqual('*').delete().then(function () {
         return Promise.resolve();
       });
     }
