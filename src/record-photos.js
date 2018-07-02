@@ -8,18 +8,27 @@
   var canvas = document.createElement('canvas');
   var canvasCtx = canvas.getContext('2d');
 
-  function capture(video, context) {
+  function capture(video) {
     canvasCtx.drawImage(video, 0, 0);
-    var data = canvas.toDataURL();
+    return canvas.toDataURL();
+  }
 
-    context.events.emit('capture-photo', {
-      dataUrl: data
-    });
+  function pad(str) {
+    str = str.toString();
+
+    if (str.length >= 4) {
+      return str;
+    }
+
+    return pad('0' + str);
   }
 
   function start(video, opts, context) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
+
+    var group = Date.now();
+    var idx = 0;
 
     canvas.width = vw;
     canvas.height = vh;
@@ -29,25 +38,48 @@
     var count = opts.count || 1;
     var interval = (opts.interval || 1) * 1000;
 
-    function onDone() {
+    function onDone(err) {
+      capturing = false;
+
       context.events.emit('stop-video');
-      context.events.emit('capture-end');
+
+      if (err) {
+        context.events.emit('error', err);
+      } else {
+        context.events.emit('capture-end', {
+          group: group
+        });
+      }
     }
 
-    setTimeout(function frame() {
+    (function frame() {
       if (capturing) {
         count -= 1;
-        capture(video, context);
 
-        if (count) {
-          return setTimeout(frame, interval);
-        }
+        var dataUrl = capture(video);
+
+        context.storage.save({
+          id: group + '_' + pad(idx++),
+          group: group,
+          dataUrl: dataUrl,
+          date: (new Date()).toISOString()
+        }).then(function () {
+          context.events.emit('capture-photo', {
+            dataUrl: dataUrl
+          });
+
+          if (count) {
+            return setTimeout(frame, interval);
+          }
+
+          return onDone();
+        }).catch(onDone);
       }
+    }());
 
-      return onDone();
-    }, interval);
-
-    context.events.emit('capture-start');
+    context.events.emit('capture-start', {
+      group: group
+    });
   }
 
   register(NAME, function () {
