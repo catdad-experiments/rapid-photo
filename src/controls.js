@@ -54,7 +54,7 @@
   }
 
   function incrementInterval(value, mod) {
-    var increments = [0.03, 0.1, 0.5, 1, 1.5, 2];
+    var increments = [0.03, 0.1, 0.5, 1, 1.5, 2, 3];
     var idx = increments.indexOf(value);
 
     if (idx === -1 || idx === (increments.length - 1)) {
