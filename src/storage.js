@@ -4,10 +4,14 @@
 (function (register) {
   var NAME = 'storage';
   var STORAGE = [];
+  var DB_NAME = 'rapid-photo';
+  var STORE_NAME = 'photos';
   var DB;
 
+  var INDEXED_DB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
   var hasDb = (function () {
-    return typeof indexedDB !== undefined;
+    return !!INDEXED_DB;
   }());
 
   function enoent() {
@@ -25,7 +29,36 @@
     }, false);
   }
 
+  function dbError(ev) {
+    var err = new Error(ev.target.error.message);
+    err.code = ev.target.error.name;
+
+    return err;
+  }
+
+  function db(operation, data) {
+    return new Promise(function (resolve, reject) {
+      var transaction = DB.transaction(STORE_NAME, 'readwrite');
+      var store = transaction.objectStore(STORE_NAME);
+      var request = store[operation](data);
+
+      request.onerror = function (ev) {
+        console.log(ev);
+
+        reject(dbError(ev));
+      };
+
+      request.onsuccess = function (ev) {
+        resolve(ev.target.result);
+      };
+    });
+  }
+
   function save(data) {
+    if (DB) {
+      return db('add', data);
+    }
+
     return new Promise(function (resolve, reject) {
       STORAGE.push(data);
 
@@ -80,6 +113,35 @@
           'there is no storage, there may be limited functionality'
         ));
       }
+
+      var request = window.indexedDB.open(DB_NAME);
+
+      request.onsuccess = function (ev) {
+        console.log(ev);
+        resolve(ev.target.result);
+      };
+
+      request.onerror = function (ev) {
+        console.log(ev);
+
+        reject(dbError(ev));
+      };
+
+      request.onabort = function () {
+        console.log('db abort');
+      };
+
+      request.oncomplete = function () {
+        console.log('db complete');
+      };
+
+      request.onupgradeneeded = function (ev) {
+        var db = ev.target.result;
+
+        var store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: false });
+
+//        store.createIndex('group', { unique: false });
+      };
     });
   }
 
