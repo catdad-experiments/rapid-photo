@@ -256,7 +256,7 @@ img {
 
 .toggle input[type=radio]:checked:after {
   background: #abd64d;
-  color: #24292e;
+  color: #3d4045;
 }
 
 .buttons {
