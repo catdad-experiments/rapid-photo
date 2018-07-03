@@ -8,46 +8,92 @@
   var canvas = document.createElement('canvas');
   var canvasCtx = canvas.getContext('2d');
 
-  function capture(video, context) {
+  function capture(video) {
     canvasCtx.drawImage(video, 0, 0);
-    var data = canvas.toDataURL();
+    return canvas.toDataURL();
+  }
 
-    context.events.emit('capture-photo', {
-      dataUrl: data
-    });
+  function pad(str) {
+    str = str.toString();
+
+    if (str.length >= 4) {
+      return str;
+    }
+
+    return pad('0' + str);
+  }
+
+  function isNumber(val) {
+    return Number(val) === val;
   }
 
   function start(video, opts, context) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
 
+    var group = Date.now();
+    var idx = 0;
+
     canvas.width = vw;
     canvas.height = vh;
 
     capturing = true;
 
-    var count = opts.count || 1;
-    var interval = (opts.interval || 1) * 1000;
+    var count = opts.count;
 
-    function onDone() {
+    function onDone(err) {
+      capturing = false;
+
       context.events.emit('stop-video');
-      context.events.emit('capture-end');
+
+      if (err) {
+        context.events.emit('error', err);
+      } else {
+        context.events.emit('capture-end', {
+          group: group
+        });
+      }
     }
 
-    setTimeout(function frame() {
-      if (capturing) {
-        count -= 1;
-        capture(video, context);
-
-        if (count) {
-          return setTimeout(frame, interval);
-        }
+    (function frame() {
+      if (!capturing) {
+        return onDone();
       }
 
-      return onDone();
-    }, interval);
+      count -= 1;
 
-    context.events.emit('capture-start');
+      var dataUrl = capture(video);
+      var photoIdx = idx++;
+      var photoId = group + '_' + pad(photoIdx);
+
+      context.storage.save({
+        id: photoId,
+        idx: photoIdx,
+        group: group,
+        dataUrl: dataUrl,
+        date: (new Date()).toISOString()
+      }).then(function () {
+        context.events.emit('capture-photo', {
+          idx: photoIdx,
+          total: opts.count,
+          dataUrl: dataUrl
+        });
+
+        if (count) {
+          return setTimeout(frame, opts.interval);
+        }
+
+        return onDone();
+      }).catch(onDone);
+    }());
+
+    context.events.emit('capture-start', {
+      group: group
+    });
+
+    return function abort() {
+      capturing = false;
+    };
   }
 
   register(NAME, function () {
@@ -59,18 +105,41 @@
       options = null;
     }
 
-    function onCapture(opts) {
-      options = opts;
+    function onCaptureInit(opts) {
+      var cleanOpts = {
+        count: Math.floor(isNumber(opts.count) ? opts.count : 1),
+        interval: (isNumber(opts.interval) ? opts.interval : 1) * 1000
+      };
+
+      if (cleanOpts.count < 1) {
+        return context.events.emit('warn', new Error('count should be 1 or higher'));
+      }
+
+      if (cleanOpts.interval < 0) {
+        return context.events.emit('warn', new Error('interval should be 0 or higher'));
+      }
+
+      options = cleanOpts;
+
+      // if all is well, start the video and start capturing photos
       context.events.once('video-playing', onVideo);
-      context.events.emit('start-video');
+      context.events.emit('start-video', {
+        quality: opts.quality
+      });
     }
 
-    context.events.on('capture', onCapture);
+    function onCaptureAbort() {
+      capturing = false;
+    }
+
+    context.events.on('capture-init', onCaptureInit);
+    context.events.on('capture-abort', onCaptureAbort);
 
     return function destroy() {
-      capturing = false;
+      onCaptureAbort();
 
-      context.events.off('capture', onCapture);
+      context.events.off('capture-init', onCaptureInit);
+      context.events.off('capture-abort', onCaptureAbort);
       context.events.off('video-playing', onVideo);
     };
   });

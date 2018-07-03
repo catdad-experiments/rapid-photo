@@ -5,6 +5,7 @@
   var NAME = 'controls';
   var controlsElem = document.querySelector('#controls');
   var captureBtn = document.querySelector('#capture');
+  var deleteAllBtn = document.querySelector('#delete-all');
 
   function createInput(id, increment) {
     var elem = document.querySelector('#' + id);
@@ -24,22 +25,46 @@
       fieldElem.value = value;
     }
 
+    function onChange() {
+      value = Number(fieldElem.value);
+    }
+
     lessElem.addEventListener('click', onLess);
     moreElem.addEventListener('click', onMore);
+    fieldElem.addEventListener('change', onChange);
 
     return Object.defineProperties({}, {
       value: {
         get: function () {
-          return value;
+          return Number(value);
         },
         set: function (val) {
-          fieldElem.value = value = val;
+          fieldElem.value = value = Number(val);
         }
       },
       destroy: {
         value: function () {
           lessElem.removeEventListener('click', onLess);
           moreElem.removeEventListener('click', onMore);
+          fieldElem.removeEventListener('change', onChange);
+        }
+      }
+    });
+  }
+
+  function createToggle(id) {
+    var radios = document.getElementsByName(id);
+
+    return Object.defineProperties({}, {
+      value: {
+        get: function () {
+          for (var i = 0, l = radios.length; i < l; i++) {
+            if (radios[i].checked) {
+              return radios[i].value;
+            }
+          }
+
+          return null;
         }
       }
     });
@@ -54,7 +79,7 @@
   }
 
   function incrementInterval(value, mod) {
-    var increments = [0.03, 0.1, 0.5, 1, 1.5, 2];
+    var increments = [0.03, 0.1, 0.5, 1, 1.5, 2, 3];
     var idx = increments.indexOf(value);
 
     if (idx === -1 || idx === (increments.length - 1)) {
@@ -73,11 +98,17 @@
 
     var countControl = createInput('count', incrementCount);
     var intervalControl = createInput('interval', incrementInterval);
+    var qualityControl = createToggle('quality');
 
     function onCaptureBtn() {
-      context.events.emit('capture', {
+      if (captureBtn.classList.contains('active')) {
+        return context.events.emit('capture-abort');
+      }
+
+      return context.events.emit('capture-init', {
         count: countControl.value,
-        interval: intervalControl.value
+        interval: intervalControl.value,
+        quality: qualityControl.value
       });
     }
 
@@ -90,14 +121,26 @@
       captureBtn.classList.remove('active');
     }
 
+    function onDeleteAll() {
+      context.events.emit('photo-deleteall');
+    }
+
+    function onReset() {
+      controlsElem.classList.remove('compact');
+    }
+
     captureBtn.addEventListener('click', onCaptureBtn);
+    deleteAllBtn.addEventListener('click', onDeleteAll);
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-end', onCaptureEnd);
+    context.events.on('reset', onReset);
 
     return function destroy() {
       captureBtn.removeEventListener('click', onCaptureBtn);
+      deleteAllBtn.removeEventListener('click', onDeleteAll);
       context.events.off('capture-start', onCaptureStart);
       context.events.off('capture-end', onCaptureEnd);
+      context.events.off('reset', onReset);
 
       countControl.destroy();
       intervalControl.destroy();
