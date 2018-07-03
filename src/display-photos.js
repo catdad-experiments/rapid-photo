@@ -9,6 +9,16 @@
     var context = this;
     var group;
 
+    function onDeleteImage(opts) {
+      context.storage.remove({ id: opts.id })
+      .then(function() {
+        opts.elem.parentElement.removeChild(opts.elem);
+      })
+      .catch(function (err) {
+        context.events.emit('warn', new Error('failed to delete image'));
+      });
+    }
+
     function onReset() {
       container.innerHTML = '';
     }
@@ -30,10 +40,29 @@
       context.storage.each({
         group: group
       }, function (record) {
+        var div = document.createElement('div');
+        div.classList.add('photo');
+
         var img = document.createElement('img');
         img.src = record.dataUrl;
 
-        fragment.appendChild(img);
+        var delBtn = document.createElement('button');
+        delBtn.classList.add('delete');
+        delBtn.addEventListener('click', onDeleteImage.bind(null, {
+          id: record.id,
+          elem: div
+        }));
+
+        var icon = document.createElement('i');
+        icon.classList.add('material-icons');
+        icon.innerHTML = 'delete';
+
+        delBtn.appendChild(icon);
+
+        div.appendChild(img);
+        div.appendChild(delBtn);
+
+        fragment.appendChild(div);
       }).then(function () {
         container.innerHTML = '';
         container.appendChild(fragment);
