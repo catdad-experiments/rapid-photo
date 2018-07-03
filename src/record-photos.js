@@ -110,6 +110,8 @@
       }
 
       options = cleanOpts;
+
+      // if all is well, start the video and start capturing photos
       context.events.once('video-playing', onVideo);
       context.events.emit('start-video');
     }
