@@ -40,7 +40,6 @@
     capturing = true;
 
     var count = opts.count;
-    var interval = opts.interval;
 
     function onDone(err) {
       capturing = false;
@@ -61,19 +60,24 @@
         count -= 1;
 
         var dataUrl = capture(video);
+        var photoIdx = idx++;
+        var photoId = group + '_' + pad(photoIdx);
 
         context.storage.save({
-          id: group + '_' + pad(idx++),
+          id: photoId,
+          idx: photoIdx,
           group: group,
           dataUrl: dataUrl,
           date: (new Date()).toISOString()
         }).then(function () {
           context.events.emit('capture-photo', {
+            idx: photoIdx,
+            total: opts.count,
             dataUrl: dataUrl
           });
 
           if (count) {
-            return setTimeout(frame, interval);
+            return setTimeout(frame, opts.interval);
           }
 
           return onDone();
