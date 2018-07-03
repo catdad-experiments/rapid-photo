@@ -173,11 +173,14 @@ img {
   width: 200px;
 }
 
-.input input, .input i {
+.input input[type=number],
+.input i {
   font-size: 1.6rem;
 }
 
-.input input, .input button, .buttons button {
+.input input[type=number],
+.input button,
+.buttons button {
   display: inline-block;
   height: 3rem;
   outline: none;
@@ -191,13 +194,16 @@ img {
   box-sizing: border-box;
 }
 
-.input input:focus, .input input:active,
-.input button:focus, .input button:active,
-.buttons button:focus, .buttons button:active {
+.input input[type=number]:focus,
+.input input[type=number]:active,
+.input button:focus,
+.input button:active,
+.buttons button:focus,
+.buttons button:active {
   border: 1px solid #abd64d;
 }
 
-.input input {
+.input input[type=number] {
   width: 110px;
   padding: 0 10px;
   text-align: center;
@@ -206,6 +212,51 @@ img {
 
 .input button {
   width: 40px;
+}
+
+.toggle-container {
+  display: inline-block;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.toggle-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.toggle input[type=radio] {
+  position: relative;
+  float: left;
+  display: inline-block;
+  width: 4rem;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.5rem;
+  color: #e5e5e5;
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
+}
+
+.toggle input[type=radio]:after {
+  content: attr(value);
+  position: absolute;
+  background: #3d4045;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.toggle input[type=radio]:checked:after {
+  background: #abd64d;
+  color: #24292e;
 }
 
 .buttons {
