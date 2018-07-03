@@ -121,10 +121,27 @@ video {
   width: 100%;
 }
 
+.photo {
+  position: relative;
+  margin: 6px auto 0px;
+  text-align: center;
+}
+
+.photo button.delete {
+  position: absolute;
+  bottom: 0;
+  height: 3rem;
+  width: 3rem;
+  background: rgba(61, 64, 69, 0.5);
+  border: 1px solid rgba(61, 64, 69, 0.5);
+  border-radius: 3px 3px 0 0;
+  outline: none;
+  color: #e5e5e5;
+}
+
 img {
   display: block;
   max-width: 100%;
-  margin: 6px auto 0px;
 }
 
 .controls {
@@ -196,12 +213,10 @@ img {
 
 .input input[type=number]:focus,
 .input input[type=number]:active,
-.input button:focus,
-.input button:active,
-.buttons button:focus,
-.buttons button:active,
 .toggle input[type=radio]:focus:after,
-.toggle input[type=radio]:active:after {
+.toggle input[type=radio]:active:after,
+button:focus,
+button:active {
   border: 1px solid #abd64d;
 }
 
