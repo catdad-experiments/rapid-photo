@@ -35,6 +35,7 @@
 
         fragment.appendChild(img);
       }).then(function () {
+        container.innerHTML = '';
         container.appendChild(fragment);
       });
     }
