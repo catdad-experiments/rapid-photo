@@ -173,7 +173,7 @@ img {
   font-size: 1.6rem;
 }
 
-.input input, .input button {
+.input input, .input button, .buttons button {
   display: inline-block;
   height: 3rem;
   outline: none;
@@ -188,7 +188,8 @@ img {
 }
 
 .input input:focus, .input input:active,
-.input button:focus, .input input:active {
+.input button:focus, .input button:active,
+.buttons button:focus, .buttons button:active {
   border: 1px solid #abd64d;
 }
 
@@ -201,4 +202,13 @@ img {
 
 .input button {
   width: 40px;
+}
+
+.buttons {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.buttons button {
+  width: 3rem;
 }

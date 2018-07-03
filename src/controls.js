@@ -5,6 +5,7 @@
   var NAME = 'controls';
   var controlsElem = document.querySelector('#controls');
   var captureBtn = document.querySelector('#capture');
+  var deleteAllBtn = document.querySelector('#delete-all');
 
   function createInput(id, increment) {
     var elem = document.querySelector('#' + id);
@@ -90,14 +91,26 @@
       captureBtn.classList.remove('active');
     }
 
+    function onDeleteAll() {
+      context.events.emit('photo-deleteall');
+    }
+
+    function onReset() {
+      controlsElem.classList.remove('compact');
+    }
+
     captureBtn.addEventListener('click', onCaptureBtn);
+    deleteAllBtn.addEventListener('click', onDeleteAll);
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-end', onCaptureEnd);
+    context.events.on('reset', onReset);
 
     return function destroy() {
       captureBtn.removeEventListener('click', onCaptureBtn);
+      deleteAllBtn.removeEventListener('click', onDeleteAll);
       context.events.off('capture-start', onCaptureStart);
       context.events.off('capture-end', onCaptureEnd);
+      context.events.off('reset', onReset);
 
       countControl.destroy();
       intervalControl.destroy();

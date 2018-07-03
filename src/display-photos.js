@@ -9,6 +9,10 @@
     var context = this;
     var group;
 
+    function onReset() {
+      container.innerHTML = '';
+    }
+
     function onCaptureStart(ev) {
       group = ev.group;
       container.innerHTML = '';
@@ -31,12 +35,24 @@
       });
     }
 
+    function onDeleteAll() {
+      context.storage.removeAll().then(function () {
+        context.events.emit('reset');
+      }).catch(function (err) {
+        context.events.emit('warn', err);
+      });
+    }
+
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-end', onCaptureEnd);
+    context.events.on('photo-deleteall', onDeleteAll);
+    context.events.on('reset', onReset);
 
     return function destroy() {
       context.events.off('capture-start', onCaptureStart);
       context.events.off('capture-end', onCaptureEnd);
+      context.events.off('photo-deleteall', onDeleteAll);
+      context.events.off('reset', onReset);
     };
   });
 }(window.registerModule));
