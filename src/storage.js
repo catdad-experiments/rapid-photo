@@ -102,17 +102,21 @@
   }
 
   function each(query, func) {
+    if (typeof query === 'function') {
+      return each(null, func);
+    }
+
     function resolve() {
       return Promise.resolve();
     }
 
     if (DB) {
-      return DB.photos.where(query).each(function (record) {
+      return (query ? DB.photos.where(query) : DB.photos).each(function (record) {
         func(record);
       }).then(resolve);
     }
 
-    return getAll(query).then(function (records) {
+    return (query ? getAll(query) : Promise.resolve(STORAGE)).then(function (records) {
       records.forEach(function (record) {
         func(record);
       });
