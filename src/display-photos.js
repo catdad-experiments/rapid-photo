@@ -9,6 +9,10 @@
     var context = this;
     var group;
 
+    function onCatch(err) {
+      context.events.emit('warn', err);
+    }
+
     function onDeleteImage(opts) {
       context.storage.remove({ id: opts.id })
       .then(function() {
@@ -19,27 +23,10 @@
       });
     }
 
-    function onReset() {
-      container.innerHTML = '';
-    }
-
-    function onCaptureStart(ev) {
-      group = ev.group;
-      container.innerHTML = 'Starting capture...';
-    }
-
-    function onCapturePhoto(ev) {
-      container.innerHTML = 'Captured photo ' + (ev.idx + 1) + ' of ' + ev.total;
-    }
-
-    function onCaptureEnd() {
-      container.innerHTML = 'Almost done...';
-
+    function displayPhotoQuery(query) {
       var fragment = document.createDocumentFragment();
 
-      context.storage.each({
-        group: group
-      }, function (record) {
+      return context.storage.each(query, function (record) {
         var div = document.createElement('div');
         div.classList.add('photo');
 
@@ -69,22 +56,48 @@
       });
     }
 
+    function onReset() {
+      container.innerHTML = '';
+    }
+
+    function onCaptureStart(ev) {
+      group = ev.group;
+      container.innerHTML = 'Starting capture...';
+    }
+
+    function onCapturePhoto(ev) {
+      container.innerHTML = 'Captured photo ' + (ev.idx + 1) + ' of ' + ev.total;
+    }
+
+    function onCaptureEnd() {
+      container.innerHTML = 'Almost done...';
+
+      displayPhotoQuery({
+        group: group
+      }).catch(onCatch);
+    }
+
     function onCaptureAbort() {
       container.innerHTML = 'Stopping...';
     }
 
+    function onViewAll() {
+      displayPhotoQuery(null).catch(onCatch);
+    }
+
     function onDeleteAll() {
-      context.storage.removeAll().then(function () {
+      context.storage.removeAll()
+      .then(function () {
         context.events.emit('reset');
-      }).catch(function (err) {
-        context.events.emit('warn', err);
-      });
+      })
+      .catch(onCatch);
     }
 
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-photo', onCapturePhoto);
     context.events.on('capture-end', onCaptureEnd);
     context.events.on('capture-abort', onCaptureAbort);
+    context.events.on('photo-viewall', onViewAll);
     context.events.on('photo-deleteall', onDeleteAll);
     context.events.on('reset', onReset);
 
@@ -93,6 +106,7 @@
       context.events.off('capture-photo', onCapturePhoto);
       context.events.off('capture-end', onCaptureEnd);
       context.events.off('capture-abort', onCaptureAbort);
+      context.events.off('photo-viewall', onViewAll);
       context.events.off('photo-deleteall', onDeleteAll);
       context.events.off('reset', onReset);
     };
