@@ -136,7 +136,7 @@
       }
 
       if (!hasDb) {
-        return done(new Error('there is no storage, there may be limited functionality'));
+        return done(new Error('there is no storage, images will not be persisted'));
       }
 
       var db = new Dexie(DB_NAME);
