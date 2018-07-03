@@ -117,7 +117,9 @@
 
       // if all is well, start the video and start capturing photos
       context.events.once('video-playing', onVideo);
-      context.events.emit('start-video');
+      context.events.emit('start-video', {
+        quality: opts.quality
+      });
     }
 
     context.events.on('capture', onCapture);

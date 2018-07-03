@@ -52,6 +52,24 @@
     });
   }
 
+  function createToggle(id) {
+    var radios = document.getElementsByName(id);
+
+    return Object.defineProperties({}, {
+      value: {
+        get: function () {
+          for (var i = 0, l = radios.length; i < l; i++) {
+            if (radios[i].checked) {
+              return radios[i].value;
+            }
+          }
+
+          return null;
+        }
+      }
+    });
+  }
+
   function incrementCount(value, mod) {
     if (value === 1 && mod < 0) {
       return value;
@@ -80,11 +98,13 @@
 
     var countControl = createInput('count', incrementCount);
     var intervalControl = createInput('interval', incrementInterval);
+    var qualityControl = createToggle('quality');
 
     function onCaptureBtn() {
       context.events.emit('capture', {
         count: countControl.value,
-        interval: intervalControl.value
+        interval: intervalControl.value,
+        quality: qualityControl.value
       });
     }
 
