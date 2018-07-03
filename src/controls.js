@@ -25,8 +25,13 @@
       fieldElem.value = value;
     }
 
+    function onChange() {
+      value = fieldElem.value;
+    }
+
     lessElem.addEventListener('click', onLess);
     moreElem.addEventListener('click', onMore);
+    fieldElem.addEventListener('change', onChange);
 
     return Object.defineProperties({}, {
       value: {
@@ -41,6 +46,7 @@
         value: function () {
           lessElem.removeEventListener('click', onLess);
           moreElem.removeEventListener('click', onMore);
+          fieldElem.removeEventListener('change', onChange);
         }
       }
     });
