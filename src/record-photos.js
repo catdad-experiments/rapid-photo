@@ -40,7 +40,6 @@
     capturing = true;
 
     var count = opts.count;
-    var interval = opts.interval;
 
     function onDone(err) {
       capturing = false;
@@ -73,11 +72,12 @@
         }).then(function () {
           context.events.emit('capture-photo', {
             idx: photoIdx,
+            total: opts.count,
             dataUrl: dataUrl
           });
 
           if (count) {
-            return setTimeout(frame, interval);
+            return setTimeout(frame, opts.interval);
           }
 
           return onDone();

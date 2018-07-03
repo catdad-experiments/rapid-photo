@@ -19,7 +19,7 @@
     }
 
     function onCapturePhoto(ev) {
-      container.innerHTML = 'Captured photo ' + (ev.idx + 1);
+      container.innerHTML = 'Captured photo ' + (ev.idx + 1) + ' of ' + ev.total;
     }
 
     function onCaptureEnd() {
