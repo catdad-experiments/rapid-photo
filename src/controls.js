@@ -26,7 +26,7 @@
     }
 
     function onChange() {
-      value = fieldElem.value;
+      value = Number(fieldElem.value);
     }
 
     lessElem.addEventListener('click', onLess);
