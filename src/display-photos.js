@@ -15,10 +15,16 @@
 
     function onCaptureStart(ev) {
       group = ev.group;
-      container.innerHTML = '';
+      container.innerHTML = 'Starting capture...';
+    }
+
+    function onCapturePhoto(ev) {
+      container.innerHTML = 'Captured photo ' + (ev.idx + 1);
     }
 
     function onCaptureEnd() {
+      container.innerHTML = 'Almost done...';
+
       var fragment = document.createDocumentFragment();
 
       context.storage.each({
@@ -42,12 +48,14 @@
     }
 
     context.events.on('capture-start', onCaptureStart);
+    context.events.on('capture-photo', onCapturePhoto);
     context.events.on('capture-end', onCaptureEnd);
     context.events.on('photo-deleteall', onDeleteAll);
     context.events.on('reset', onReset);
 
     return function destroy() {
       context.events.off('capture-start', onCaptureStart);
+      context.events.off('capture-photo', onCapturePhoto);
       context.events.off('capture-end', onCaptureEnd);
       context.events.off('photo-deleteall', onDeleteAll);
       context.events.off('reset', onReset);

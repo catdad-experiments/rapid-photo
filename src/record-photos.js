@@ -61,14 +61,18 @@
         count -= 1;
 
         var dataUrl = capture(video);
+        var photoIdx = idx++;
+        var photoId = group + '_' + pad(photoIdx);
 
         context.storage.save({
-          id: group + '_' + pad(idx++),
+          id: photoId,
+          idx: photoIdx,
           group: group,
           dataUrl: dataUrl,
           date: (new Date()).toISOString()
         }).then(function () {
           context.events.emit('capture-photo', {
+            idx: photoIdx,
             dataUrl: dataUrl
           });
 
