@@ -5,7 +5,7 @@
   var NAME = 'controls';
   var controlsElem = document.querySelector('#controls');
   var captureBtn = document.querySelector('#capture');
-  var viewAllBtn = document.querySelector('#viewAllBtn');
+  var viewAllBtn = document.querySelector('#view-all');
   var deleteAllBtn = document.querySelector('#delete-all');
 
   function createInput(id, increment) {
