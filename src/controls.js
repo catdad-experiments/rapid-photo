@@ -36,10 +36,10 @@
     return Object.defineProperties({}, {
       value: {
         get: function () {
-          return value;
+          return Number(value);
         },
         set: function (val) {
-          fieldElem.value = value = val;
+          fieldElem.value = value = Number(val);
         }
       },
       destroy: {
