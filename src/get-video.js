@@ -6,7 +6,7 @@
 
   var video = document.querySelector('#video');
 
-  function pickDevice(devices) {
+  function pickDevice(devices, opts) {
     var sourceId = null;
 
     // enumerate all devices all array-like
@@ -34,22 +34,29 @@
       throw new Error('no video input');
     }
 
-    return navigator.mediaDevices.getUserMedia({
+    var constraints = {
       audio: false,
       video: {
         // these options only work with adapter.js
         // https://github.com/webrtc/adapter
-        deviceId: sourceId,
-        width: 10000,
-        height: 10000
+        deviceId: sourceId
       }
-    });
+    };
+
+    if (opts.quality === 'high') {
+      constraints.video.width = 10000;
+      constraints.video.height = 10000;
+    }
+
+    return navigator.mediaDevices.getUserMedia(constraints);
   }
 
-  function getVideo() {
+  function getVideo(opts) {
     return navigator.mediaDevices
       .enumerateDevices()
-      .then(pickDevice);
+      .then(function (devices) {
+        return pickDevice(devices, opts);
+      });
   }
 
   function playVideo(source) {
@@ -70,8 +77,16 @@
     var context = this;
     var sourceMedia;
 
-    function onStartVideo() {
-      getVideo()
+    function onStartVideo(opts) {
+      var vidOpts = {
+        quality: 'low'
+      };
+
+      if (opts && opts.quality) {
+        vidOpts = opts.quality;
+      }
+
+      getVideo(opts)
       .then(function (source) {
         sourceMedia = source;
         return playVideo(source);
