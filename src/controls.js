@@ -101,7 +101,11 @@
     var qualityControl = createToggle('quality');
 
     function onCaptureBtn() {
-      context.events.emit('capture', {
+      if (captureBtn.classList.contains('active')) {
+        return context.events.emit('capture-abort');
+      }
+
+      return context.events.emit('capture-init', {
         count: countControl.value,
         interval: intervalControl.value,
         quality: qualityControl.value

@@ -40,6 +40,10 @@
       });
     }
 
+    function onCaptureAbort() {
+      container.innerHTML = 'Stopping...';
+    }
+
     function onDeleteAll() {
       context.storage.removeAll().then(function () {
         context.events.emit('reset');
@@ -51,6 +55,7 @@
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-photo', onCapturePhoto);
     context.events.on('capture-end', onCaptureEnd);
+    context.events.on('capture-abort', onCaptureAbort);
     context.events.on('photo-deleteall', onDeleteAll);
     context.events.on('reset', onReset);
 
@@ -58,6 +63,7 @@
       context.events.off('capture-start', onCaptureStart);
       context.events.off('capture-photo', onCapturePhoto);
       context.events.off('capture-end', onCaptureEnd);
+      context.events.off('capture-abort', onCaptureAbort);
       context.events.off('photo-deleteall', onDeleteAll);
       context.events.off('reset', onReset);
     };
