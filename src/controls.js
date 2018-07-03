@@ -25,22 +25,28 @@
       fieldElem.value = value;
     }
 
+    function onChange() {
+      value = Number(fieldElem.value);
+    }
+
     lessElem.addEventListener('click', onLess);
     moreElem.addEventListener('click', onMore);
+    fieldElem.addEventListener('change', onChange);
 
     return Object.defineProperties({}, {
       value: {
         get: function () {
-          return value;
+          return Number(value);
         },
         set: function (val) {
-          fieldElem.value = value = val;
+          fieldElem.value = value = Number(val);
         }
       },
       destroy: {
         value: function () {
           lessElem.removeEventListener('click', onLess);
           moreElem.removeEventListener('click', onMore);
+          fieldElem.removeEventListener('change', onChange);
         }
       }
     });
