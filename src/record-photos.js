@@ -56,38 +56,44 @@
     }
 
     (function frame() {
-      if (capturing) {
-        count -= 1;
-
-        var dataUrl = capture(video);
-        var photoIdx = idx++;
-        var photoId = group + '_' + pad(photoIdx);
-
-        context.storage.save({
-          id: photoId,
-          idx: photoIdx,
-          group: group,
-          dataUrl: dataUrl,
-          date: (new Date()).toISOString()
-        }).then(function () {
-          context.events.emit('capture-photo', {
-            idx: photoIdx,
-            total: opts.count,
-            dataUrl: dataUrl
-          });
-
-          if (count) {
-            return setTimeout(frame, opts.interval);
-          }
-
-          return onDone();
-        }).catch(onDone);
+      if (!capturing) {
+        return onDone();
       }
+
+      count -= 1;
+
+      var dataUrl = capture(video);
+      var photoIdx = idx++;
+      var photoId = group + '_' + pad(photoIdx);
+
+      context.storage.save({
+        id: photoId,
+        idx: photoIdx,
+        group: group,
+        dataUrl: dataUrl,
+        date: (new Date()).toISOString()
+      }).then(function () {
+        context.events.emit('capture-photo', {
+          idx: photoIdx,
+          total: opts.count,
+          dataUrl: dataUrl
+        });
+
+        if (count) {
+          return setTimeout(frame, opts.interval);
+        }
+
+        return onDone();
+      }).catch(onDone);
     }());
 
     context.events.emit('capture-start', {
       group: group
     });
+
+    return function abort() {
+      capturing = false;
+    };
   }
 
   register(NAME, function () {
@@ -99,7 +105,7 @@
       options = null;
     }
 
-    function onCapture(opts) {
+    function onCaptureInit(opts) {
       var cleanOpts = {
         count: Math.floor(isNumber(opts.count) ? opts.count : 1),
         interval: (isNumber(opts.interval) ? opts.interval : 1) * 1000
@@ -122,12 +128,18 @@
       });
     }
 
-    context.events.on('capture', onCapture);
+    function onCaptureAbort() {
+      capturing = false;
+    }
+
+    context.events.on('capture-init', onCaptureInit);
+    context.events.on('capture-abort', onCaptureAbort);
 
     return function destroy() {
-      capturing = false;
+      onCaptureAbort();
 
-      context.events.off('capture', onCapture);
+      context.events.off('capture-init', onCaptureInit);
+      context.events.off('capture-abort', onCaptureAbort);
       context.events.off('video-playing', onVideo);
     };
   });
