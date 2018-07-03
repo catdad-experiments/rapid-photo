@@ -21,16 +21,14 @@
     function onCaptureEnd() {
       var fragment = document.createDocumentFragment();
 
-      context.storage.getAll({
+      context.storage.each({
         group: group
-      }).then(function (photos) {
-        photos.forEach(function (record) {
-          var img = document.createElement('img');
-          img.src = record.dataUrl;
+      }, function (record) {
+        var img = document.createElement('img');
+        img.src = record.dataUrl;
 
-          fragment.appendChild(img);
-        });
-
+        fragment.appendChild(img);
+      }).then(function () {
         container.appendChild(fragment);
       });
     }

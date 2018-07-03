@@ -101,6 +101,24 @@
     });
   }
 
+  function each(query, func) {
+    function resolve() {
+      return Promise.resolve();
+    }
+
+    if (DB) {
+      return DB.photos.where(query).each(function (record) {
+        func(record);
+      }).then(resolve);
+    }
+
+    return getAll(query).then(function (records) {
+      records.forEach(function (record) {
+        func(record);
+      });
+    }).then(resolve);
+  }
+
   function initIndexedDb() {
     return new Promise(function (resolve, reject) {
       function done(err, data) {
@@ -145,7 +163,8 @@
       remove: remove,
       removeAll: removeAll,
       get: get,
-      getAll: getAll
+      getAll: getAll,
+      each: each
     };
   });
 }(window.registerModule));
