@@ -23,6 +23,10 @@
     return pad('0' + str);
   }
 
+  function isNumber(val) {
+    return Number(val) === val;
+  }
+
   function start(video, opts, context) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
@@ -35,8 +39,8 @@
 
     capturing = true;
 
-    var count = opts.count || 1;
-    var interval = (opts.interval || 1) * 1000;
+    var count = opts.count;
+    var interval = opts.interval;
 
     function onDone(err) {
       capturing = false;
@@ -92,7 +96,22 @@
     }
 
     function onCapture(opts) {
-      options = opts;
+      var cleanOpts = {
+        count: Math.floor(isNumber(opts.count) ? opts.count : 1),
+        interval: (isNumber(opts.interval) ? opts.interval : 1) * 1000
+      };
+
+      if (cleanOpts.count < 1) {
+        return context.events.emit('warn', new Error('count should be 1 or higher'));
+      }
+
+      if (cleanOpts.interval < 0) {
+        return context.events.emit('warn', new Error('interval should be 0 or higher'));
+      }
+
+      options = cleanOpts;
+
+      // if all is well, start the video and start capturing photos
       context.events.once('video-playing', onVideo);
       context.events.emit('start-video');
     }
