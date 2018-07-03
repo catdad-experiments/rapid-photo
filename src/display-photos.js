@@ -9,6 +9,53 @@
     var context = this;
     var group;
 
+    function onCatch(err) {
+      context.events.emit('warn', err);
+    }
+
+    function onDeleteImage(opts) {
+      context.storage.remove({ id: opts.id })
+      .then(function() {
+        opts.elem.parentElement.removeChild(opts.elem);
+      })
+      .catch(function (err) {
+        context.events.emit('warn', new Error('failed to delete image'));
+      });
+    }
+
+    function displayPhotoQuery(query) {
+      var fragment = document.createDocumentFragment();
+
+      return context.storage.each(query, function (record) {
+        var div = document.createElement('div');
+        div.classList.add('photo');
+
+        var img = document.createElement('img');
+        img.src = record.dataUrl;
+
+        var delBtn = document.createElement('button');
+        delBtn.classList.add('delete');
+        delBtn.addEventListener('click', onDeleteImage.bind(null, {
+          id: record.id,
+          elem: div
+        }));
+
+        var icon = document.createElement('i');
+        icon.classList.add('material-icons');
+        icon.innerHTML = 'delete';
+
+        delBtn.appendChild(icon);
+
+        div.appendChild(img);
+        div.appendChild(delBtn);
+
+        fragment.appendChild(div);
+      }).then(function () {
+        container.innerHTML = '';
+        container.appendChild(fragment);
+      });
+    }
+
     function onReset() {
       container.innerHTML = '';
     }
@@ -25,37 +72,32 @@
     function onCaptureEnd() {
       container.innerHTML = 'Almost done...';
 
-      var fragment = document.createDocumentFragment();
-
-      context.storage.each({
+      displayPhotoQuery({
         group: group
-      }, function (record) {
-        var img = document.createElement('img');
-        img.src = record.dataUrl;
-
-        fragment.appendChild(img);
-      }).then(function () {
-        container.innerHTML = '';
-        container.appendChild(fragment);
-      });
+      }).catch(onCatch);
     }
 
     function onCaptureAbort() {
       container.innerHTML = 'Stopping...';
     }
 
+    function onViewAll() {
+      displayPhotoQuery(null).catch(onCatch);
+    }
+
     function onDeleteAll() {
-      context.storage.removeAll().then(function () {
+      context.storage.removeAll()
+      .then(function () {
         context.events.emit('reset');
-      }).catch(function (err) {
-        context.events.emit('warn', err);
-      });
+      })
+      .catch(onCatch);
     }
 
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-photo', onCapturePhoto);
     context.events.on('capture-end', onCaptureEnd);
     context.events.on('capture-abort', onCaptureAbort);
+    context.events.on('photo-viewall', onViewAll);
     context.events.on('photo-deleteall', onDeleteAll);
     context.events.on('reset', onReset);
 
@@ -64,6 +106,7 @@
       context.events.off('capture-photo', onCapturePhoto);
       context.events.off('capture-end', onCaptureEnd);
       context.events.off('capture-abort', onCaptureAbort);
+      context.events.off('photo-viewall', onViewAll);
       context.events.off('photo-deleteall', onDeleteAll);
       context.events.off('reset', onReset);
     };

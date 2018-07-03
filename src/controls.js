@@ -5,6 +5,7 @@
   var NAME = 'controls';
   var controlsElem = document.querySelector('#controls');
   var captureBtn = document.querySelector('#capture');
+  var viewAllBtn = document.querySelector('#view-all');
   var deleteAllBtn = document.querySelector('#delete-all');
 
   function createInput(id, increment) {
@@ -79,7 +80,7 @@
   }
 
   function incrementInterval(value, mod) {
-    var increments = [0.03, 0.1, 0.5, 1, 1.5, 2, 3];
+    var increments = [0, 0.5, 1, 1.5, 2, 3];
     var idx = increments.indexOf(value);
 
     if (idx === -1 || idx === (increments.length - 1)) {
@@ -121,6 +122,10 @@
       captureBtn.classList.remove('active');
     }
 
+    function onViewAll() {
+      context.events.emit('photo-viewall');
+    }
+
     function onDeleteAll() {
       context.events.emit('photo-deleteall');
     }
@@ -130,6 +135,7 @@
     }
 
     captureBtn.addEventListener('click', onCaptureBtn);
+    viewAllBtn.addEventListener('click', onViewAll);
     deleteAllBtn.addEventListener('click', onDeleteAll);
     context.events.on('capture-start', onCaptureStart);
     context.events.on('capture-end', onCaptureEnd);
@@ -137,6 +143,7 @@
 
     return function destroy() {
       captureBtn.removeEventListener('click', onCaptureBtn);
+      viewAllBtn.removeEventListener('click', onViewAll);
       deleteAllBtn.removeEventListener('click', onDeleteAll);
       context.events.off('capture-start', onCaptureStart);
       context.events.off('capture-end', onCaptureEnd);

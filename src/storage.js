@@ -102,17 +102,21 @@
   }
 
   function each(query, func) {
+    if (typeof query === 'function') {
+      return each(null, func);
+    }
+
     function resolve() {
       return Promise.resolve();
     }
 
     if (DB) {
-      return DB.photos.where(query).each(function (record) {
+      return (query ? DB.photos.where(query) : DB.photos).each(function (record) {
         func(record);
       }).then(resolve);
     }
 
-    return getAll(query).then(function (records) {
+    return (query ? getAll(query) : Promise.resolve(STORAGE)).then(function (records) {
       records.forEach(function (record) {
         func(record);
       });
@@ -132,7 +136,7 @@
       }
 
       if (!hasDb) {
-        return done(new Error('there is no storage, there may be limited functionality'));
+        return done(new Error('there is no storage, images will not be persisted'));
       }
 
       var db = new Dexie(DB_NAME);
